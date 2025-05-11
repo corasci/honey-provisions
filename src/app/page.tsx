@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function Home() {
   return (
     <div className="space-y-6">
@@ -5,18 +7,18 @@ export default function Home() {
         Honey Provisions is a minimalist product formulation consultancy. We develop custom formulas for functional beverages, capsules, powders, and skincare.
       </p>
       <div className="border-l-2 pl-4 space-y-4">
-        <div className="border p-4 bg-white">
+        <Link href="/builder" className="block border p-4 bg-white hover:bg-gray-50 transition">
           <h2 className="font-semibold mb-1">🧪 Start a Product Profile</h2>
           <p className="text-sm text-gray-700">
             Answer a few quick questions to generate a scope of work.
           </p>
-        </div>
-        <div className="border p-4 bg-white">
+        </Link>
+        <Link href="/services" className="block border p-4 bg-white hover:bg-gray-50 transition">
           <h2 className="font-semibold mb-1">💡 Services</h2>
           <p className="text-sm text-gray-700">
             Concept-to-market formulation for DTC and CPG brands.
           </p>
-        </div>
+        </Link>
       </div>
     </div>
   );
