@@ -1,87 +1,159 @@
-'use client';
 
-import { useState } from 'react';
+"use client";
 
-export default function Builder() {
-  const [step, setStep] = useState(0);
-  const [form, setForm] = useState({
-    productType: '',
-    dosageForm: '',
-    keyIngredients: '',
-    targetClaims: '',
-  });
+import { useState } from "react";
 
-  const steps = [
-    {
-      label: 'What type of product are you formulating?',
-      name: 'productType',
-      placeholder: 'e.g., Nootropic drink, Collagen capsule...',
-    },
-    {
-      label: 'What is the dosage form?',
-      name: 'dosageForm',
-      placeholder: 'e.g., Powder stick, Gummy, Beverage...',
-    },
-    {
-      label: 'Any key ingredients you want to include?',
-      name: 'keyIngredients',
-      placeholder: 'e.g., Ashwagandha, B12, Creatine...',
-    },
-    {
-      label: 'What effects or claims are you targeting?',
-      name: 'targetClaims',
-      placeholder: 'e.g., Stress support, Energy, Skin health...',
-    },
-  ];
+type Question = {
+  name: string;
+  label: string;
+  placeholder?: string;
+};
 
-  const current = steps[step];
+type Phase = {
+  name: string;
+  questions: Question[];
+};
 
-  const handleChange = (e) => {
-    setForm({ ...form, [current.name]: e.target.value });
+const phases: Phase[] = [
+  {
+    name: "Product Overview",
+    questions: [
+      { name: "productName", label: "Product Name", placeholder: "e.g., Calm Elixir" },
+      { name: "productType", label: "Product Type", placeholder: "e.g., Beverage, Tablet" },
+      { name: "productFunction", label: "Product Function", placeholder: "e.g., Stress Relief" },
+    ],
+  },
+  {
+    name: "Target Audience",
+    questions: [
+      { name: "targetAudience", label: "Target Audience", placeholder: "e.g., Adults seeking relaxation" },
+      { name: "lifestylePrefs", label: "Lifestyle Preferences", placeholder: "e.g., Vegan, Keto, Gluten-Free" },
+    ],
+  },
+  {
+    name: "Ingredient Priorities",
+    questions: [
+      { name: "mustHaveIngredients", label: "Must-Have Ingredients", placeholder: "e.g., Kava, L-Theanine" },
+      { name: "brandedIngredients", label: "Preferred Branded Ingredients", placeholder: "e.g., Sensoril Ashwagandha" },
+      { name: "targetClaims", label: "Desired Claims", placeholder: "e.g., Calm, Focused Energy" },
+    ],
+  },
+  {
+    name: "Form & Flavor",
+    questions: [
+      { name: "deliveryForm", label: "Delivery Form", placeholder: "e.g., 2oz shot, 12oz can, tablet" },
+      { name: "dosageFrequency", label: "Dosage/Frequency", placeholder: "e.g., Once daily" },
+      { name: "flavorProfile", label: "Flavor Profile", placeholder: "e.g., Hibiscus Ginger" },
+      { name: "sweetenerRestrictions", label: "Sweetener Restrictions", placeholder: "e.g., No stevia" },
+    ],
+  },
+  {
+    name: "Commercialization",
+    questions: [
+      { name: "packagingType", label: "Packaging Type", placeholder: "e.g., Sleek Can, Blister Pack" },
+      { name: "marketRegion", label: "Target Market Region", placeholder: "e.g., US, EU" },
+      { name: "productionVolume", label: "Anticipated Production Volume", placeholder: "e.g., 10,000 units" },
+    ],
+  },
+  {
+    name: "Contact Information",
+    questions: [
+      { name: "name", label: "Your Name", placeholder: "e.g., Jane Doe" },
+      { name: "company", label: "Company Name", placeholder: "e.g., Herbal Labs Inc." },
+      { name: "email", label: "Email Address", placeholder: "e.g., jane@herballabs.com" },
+      { name: "phone", label: "Phone Number", placeholder: "e.g., (123) 456-7890" },
+    ],
+  },
+];
+
+export default function BuilderPage() {
+  const [formData, setFormData] = useState<Record<string, string>>({});
+  const [currentPhaseIndex, setCurrentPhaseIndex] = useState(0);
+  const [submitted, setSubmitted] = useState(false);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const nextStep = () => {
-    if (step < steps.length - 1) setStep(step + 1);
+  const handleNext = () => {
+    if (currentPhaseIndex < phases.length - 1) {
+      setCurrentPhaseIndex(currentPhaseIndex + 1);
+    }
   };
 
-  const prevStep = () => {
-    if (step > 0) setStep(step - 1);
+  const handleBack = () => {
+    if (currentPhaseIndex > 0) {
+      setCurrentPhaseIndex(currentPhaseIndex - 1);
+    }
   };
+
+  const handleSubmit = async () => {
+    await fetch("/api/send", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(formData),
+    });
+    setSubmitted(true);
+  };
+
+  const phase = phases[currentPhaseIndex];
+
+  if (submitted) {
+    return (
+      <div className="max-w-xl mx-auto px-4 py-10">
+        <h1 className="text-xl font-semibold mb-4">Thank you!</h1>
+        <p>Your product profile has been submitted.</p>
+      </div>
+    );
+  }
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-xl font-semibold">Start a Product Profile</h1>
-      <div className="border p-6 bg-white space-y-4 rounded-md shadow">
-        <label className="block text-sm font-medium text-gray-900">
-          {current.label}
-        </label>
-        <input
-          type="text"
-          name={current.name}
-          placeholder={current.placeholder}
-          value={form[current.name]}
-          onChange={handleChange}
-          className="w-full border px-3 py-2 text-sm rounded-md"
-        />
-        <div className="flex justify-between pt-2">
+    <div className="max-w-xl mx-auto px-4 py-10">
+      <h1 className="text-2xl font-semibold mb-6">Start a Product Profile</h1>
+      <p className="text-sm text-gray-500 mb-4">Step {currentPhaseIndex + 1} of {phases.length}</p>
+
+      <h2 className="text-xl font-semibold mb-4">{phase.name}</h2>
+
+      <form className="space-y-4">
+        {phase.questions.map((q) => (
+          <div key={q.name} className="flex flex-col">
+            <label className="mb-1 font-medium">{q.label}</label>
+            <input
+              type="text"
+              name={q.name}
+              placeholder={q.placeholder}
+              value={formData[q.name] || ""}
+              onChange={handleChange}
+              className="border px-3 py-2 rounded-md"
+            />
+          </div>
+        ))}
+      </form>
+
+      <div className="mt-6 flex justify-between">
+        {currentPhaseIndex > 0 && (
           <button
-            onClick={prevStep}
-            disabled={step === 0}
-            className="text-sm text-gray-600 hover:underline disabled:opacity-30"
+            onClick={handleBack}
+            className="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400"
           >
             Back
           </button>
-          {step < steps.length - 1 ? (
-            <button
-              onClick={nextStep}
-              className="text-sm text-blue-600 hover:underline"
-            >
-              Next
-            </button>
-          ) : (
-            <div className="text-sm text-green-700">✓ Form complete</div>
-          )}
-        </div>
+        )}
+        {currentPhaseIndex < phases.length - 1 ? (
+          <button
+            onClick={handleNext}
+            className="ml-auto px-4 py-2 bg-black text-white rounded hover:bg-gray-900"
+          >
+            Next
+          </button>
+        ) : (
+          <button
+            onClick={handleSubmit}
+            className="ml-auto px-4 py-2 bg-black text-white rounded hover:bg-gray-900"
+          >
+            Submit
+          </button>
+        )}
       </div>
     </div>
   );
