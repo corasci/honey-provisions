@@ -31,8 +31,8 @@ export default function Contact() {
         />
         <div className="text-sm text-center text-gray-700">
           <p>Honey Provisions</p>
-          <p>2900 W Anderson Lane</p>
-          <p>Suite C-200, #209</p>
+          <p>2900 W. Anderson Lane</p>
+          <p>Suite C-200, #270</p>
           <p>Austin, TX 78757</p>
           <p>Phone: Coming soon</p>
         </div>
